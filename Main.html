@@ -1,0 +1,186 @@
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Effects of Twitter Hype on Financial Markets</title>
+        <script type="text/javascript" src="lib/d3.v5.min.js"></script>
+        <style type = "text/css">
+            
+            text {
+                font-family: candara;
+            }
+            
+            .line{
+                fill: none
+            }
+            div {
+            }
+            
+            
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+            
+            var w = 1600;
+            var h = 600;
+            var wPadding = 60;
+            var hPadding = 40;
+            var parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S%Z");
+            
+            d3.select("body")
+              .append("svg")
+              .attr("width", w)
+              .attr("height", 30)
+              .attr("font-size", 30)
+              .append("text")
+              .attr("x", w/2-70)
+              .attr("y", 22)
+              .text("Analyzing the Effect of Twitter Hype on Financial Markets")
+              .attr("text-anchor", "middle");
+              
+             
+            d3.dsv(",", "finance_data.csv", function (d) {
+                return {
+                    datetime: parseTime(d.Datetime),
+                    TSLA_price: parseFloat(d.TSLA_price),
+                    AMD_price: parseFloat(d.AMD_price),
+                    GE_price: parseFloat(d.GE_price),
+                    ZM_price: parseFloat(d.ZM_price)
+                }
+            } ).then(function(data) {
+                
+                
+                var minDate = d3.min(data, function(d) { return d.datetime});
+                var maxDate = d3.max(data, function(d) { return d.datetime});
+                var min = d3.min(data, function(d) {return d.TSLA_price})
+                var max = d3.max(data, function(d) {return d.TSLA_price})
+                
+                var xScale = d3.scaleTime()
+                                .domain([minDate,maxDate])
+                                .range([wPadding*2, w-wPadding*4])
+                               
+                var xAxis = d3.axisBottom()
+                              .scale(xScale)
+                              .tickValues(d3.timeDay.range(minDate, maxDate, 1))
+                              .tickFormat(d3.timeFormat("%m/%d"));
+               
+                var yScale = d3.scaleLinear()
+                               .domain([min*0.95,(max*1.05)])
+                               .range([h-hPadding, hPadding]);
+                
+                var yAxis = d3.axisLeft()
+                              .scale(yScale)
+                              .ticks(10);
+                              
+                
+                var selectContainer = d3.select("body")
+                                        .append("div")
+                                        .attr("width", 40)
+                                        .attr("height", 20);
+                                        
+                selectContainer.append("text")
+                               .text("Select a stock: ")
+                               .attr("class", "text")
+                               .attr("font-size", "12px");
+                
+                selectContainer.append("select")
+                               .selectAll("option")
+                               .data(["Tesla (TSLA)", "AMD (AMD)", "GE (GE)", "Zoom (ZM)"])
+                               .enter()
+                               .append("option")
+                               .attr("class","text")
+                               .text(function(d) {return d;})
+                               .attr("value", function(d,i) {return i;});
+                               
+                selectContainer.select("select")
+                               .on("change", function(d) {
+                                   updateChart(d3.select(this).property("value"));
+                               });
+                               
+                var svg = d3.select("body")
+                            .append("svg")
+                            .attr("width", 14*w/16)
+                            .attr("height", h)
+                            .attr("x", (2*w/16))
+                            .attr("y", 0)
+                            .style("position", "absolute")
+                            .style("background-color", "white");
+
+    
+                svg.append("g")
+                   .attr("class", "x axis")
+                   .attr("transform", "translate(0," + (h-hPadding) + ")")
+                   .call(xAxis);
+                 
+                svg.append("g")
+                   .attr("class", "y axis")
+                   .attr("transform", "translate(" + wPadding*2 + ",0)")
+                   .call(yAxis);
+                              
+                var line = d3.line()
+                             .defined(function(d) { return d.TSLA_price >= 0; })
+                             .x(function(d) {return xScale(d.datetime)})
+                             .y(function(d) {return yScale(d.TSLA_price)});
+                             
+                var path = svg.append("g")
+
+                path.append("path")
+                    .datum(data)
+                    .attr("class", "line")
+                    .attr("d", line)
+                    .style("stroke", '#a6611a');
+    
+                var updateChart = function(index) {
+                    if(index == 0) {
+                        min = d3.min(data, function(d) {return d.TSLA_price})
+                        max = d3.max(data, function(d) {return d.TSLA_price})
+                        line = d3.line()
+                                 .defined(function(d) { return d.TSLA_price >= 0; })
+                                 .x(function(d) {return xScale(d.datetime)})
+                                 .y(function(d) {return yScale(d.TSLA_price)});
+                    } else if (index == 1) {
+                        min = d3.min(data, function(d) {return d.AMD_price})
+                        max = d3.max(data, function(d) {return d.AMD_price})
+                        line = d3.line()
+                                 .defined(function(d) { return d.AMD_price >= 0; })
+                                 .x(function(d) {return xScale(d.datetime)})
+                                 .y(function(d) {return yScale(d.AMD_price)});
+                    } else if (index == 2) {
+                        min = d3.min(data, function(d) {return d.GE_price})
+                        max = d3.max(data, function(d) {return d.GE_price})
+                        line = d3.line()
+                                 .defined(function(d) { return d.GE_price >= 0; })
+                                 .x(function(d) {return xScale(d.datetime)})
+                                 .y(function(d) {return yScale(d.GE_price)});
+                    } else {
+                        min = d3.min(data, function(d) {return d.ZM_price})
+                        max = d3.max(data, function(d) {return d.ZM_price})
+                        line = d3.line()
+                                 .defined(function(d) { return d.ZM_price >= 0; })
+                                 .x(function(d) {return xScale(d.datetime)})
+                                 .y(function(d) {return yScale(d.ZM_price)});
+                    }
+                    
+                    
+                    yScale.domain([min*0.95,(max*1.05)]);          
+                    svg.select(".y.axis")
+                    .transition()
+                    .duration(500)
+                    .call(yAxis);    
+                    
+                    svg.select(".line")
+                       .datum(data)
+                       .transition()
+                       .duration(500)
+                       .attr("d", line);
+                    
+                    
+                    
+                    
+                }
+            
+            })
+            
+        </script>
+    </body>
+</html>
