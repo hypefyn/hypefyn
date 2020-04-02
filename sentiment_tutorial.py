@@ -130,11 +130,13 @@ test_data = dataset[7000:]
 # %% Building a classifier model: Naive Bayes
 
 from nltk import classify
-from nltk import NaiveBayesClassifier
+from nltk import NaiveBayesClassifier 
 classifier = NaiveBayesClassifier.train(train_data)
 
 print("Accuracy is:", classify.accuracy(classifier, test_data))
 
 print(classifier.show_most_informative_features(10))
 
-ID, text, retweets, favourites, timestamp
+
+
+# %%
