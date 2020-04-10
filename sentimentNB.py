@@ -1,5 +1,5 @@
 # %%
-import json
+import json, pickle
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -26,10 +26,13 @@ pipeline = Pipeline([
 # %%
 pipeline.fit(data.tokens, data.label)
 print("Model trained")
-# test_pred = pipeline.predict(test_text)
 
+# test_pred = pipeline.predict(test_text)
 # print(classification_report(test_label, test_pred), confusion_matrix(test_label, test_pred))
 
+with open(".models/NB_trained.pickle","wb") as file:
+    pickle.dump(pipeline,file)
+print("Model exported")
 
 # %%
 tweets_clean = pd.read_csv("data/tweets_clean_joint.json")
