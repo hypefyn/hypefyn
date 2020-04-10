@@ -39,7 +39,7 @@ def hype_scores(tweets_group, weights=(1,1,1)):
 
 def get_hype(df, grouping, weights=(1,1,1), delta_t=1):
 
-    time_delta = pd.Timedelta(minutes=delta_t)
+    # time_delta = pd.Timedelta(minutes=delta_t)
     hype = {}
     i = 0
 
@@ -50,29 +50,13 @@ def get_hype(df, grouping, weights=(1,1,1), delta_t=1):
             tweets_group = pd.concat([tweets_group,tweets[tweets.keyword == key].copy()])
         while tweets_group.shape[0] != 0:
             time_start = tweets_group.timestamp.min()
-            tw = tweets_group[tweets_group.timestamp <= time_start + time_delta]
+            tw = tweets_group[tweets_group.timestamp <= time_start]# + time_delta]
             pos_hype, neg_hype = hype_scores(tw, weights)
             tweets_group.drop(tw.index,inplace=True)
-            hype[i] = [group,str(time_start + time_delta/2),pos_hype,neg_hype]
+            hype[i] = [group,
+                        str(time_start),# + time_delta/2),
+                        pos_hype,neg_hype]
             i += 1
-    
-    return pd.DataFrame.from_dict(hype,orient='index',columns=["keyword","timestamp","pos_hype","neg_hype"])
-
-
-def get_hype_corona(df, weights=(1,1,1), delta_t=1):
-    
-    corona_df = df[(df.keyword == "corona") | (df.keyword == "COVID")].copy()
-    time_delta = pd.Timedelta(minutes=delta_t)
-    hype = {}
-    i = 0
-    
-    while corona_df.shape[0] != 0:
-        time_start = corona_df.timestamp.min()
-        tw = corona_df[corona_df.timestamp <= time_start + time_delta]
-        pos_hype, neg_hype = hype_scores(tw, weights)
-        corona_df.drop(tw.index,inplace=True)
-        hype[i] = ["Coronavirus",str(time_start + time_delta/2),pos_hype,neg_hype]
-        i += 1
     
     return pd.DataFrame.from_dict(hype,orient='index',columns=["keyword","timestamp","pos_hype","neg_hype"])
 
