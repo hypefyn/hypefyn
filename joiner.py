@@ -18,3 +18,4 @@ for d in test.values():
 # %%
 with open("data/sentiment140/sentiment140_clean_joint.json",'w') as v:
     json.dump(train,v)
+    

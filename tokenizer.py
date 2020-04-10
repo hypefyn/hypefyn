@@ -70,8 +70,8 @@ def dict_to_json(label, tokens_clean, output_path):
         json.dump(exp,o)
 
 # %%
-sentiment_path = drive_path + "data/sentiment140/"
-tweets_path = drive_path + "data/"
+sentiment_path = "data/sentiment140/"
+tweets_path = "data/"
 
 stop_words = stopwords.words('english')
 
