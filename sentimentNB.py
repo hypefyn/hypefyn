@@ -11,6 +11,7 @@ from sklearn.metrics import average_precision_score, confusion_matrix, classific
 # %%
 
 data = pd.read_json("data/sentiment140/sentiment140_clean_joint.json", orient='index')
+print("Data Loaded")
 
 #%%
 
@@ -24,7 +25,7 @@ pipeline = Pipeline([
 
 # %%
 pipeline.fit(data.tokens, data.label)
-
+print("Model trained")
 # test_pred = pipeline.predict(test_text)
 
 # print(classification_report(test_label, test_pred), confusion_matrix(test_label, test_pred))
@@ -39,5 +40,5 @@ tweets = pd.read_csv("data\all_tweets.csv")
 tweets_sent = ["Pos" if sent==4 else "Neg" for sent in tweets_pred]
 tweets_out = pd.concat([tweets, pd.DataFrame(tweets_sent,columns=["Prediction"])],axis=1)
 tweets_out.to_csv("data/tweets_pred.csv")
-
+print("Predictions generated")
 
