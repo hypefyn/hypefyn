@@ -6,9 +6,15 @@ import numpy as np
 # %%
 tweets = pd.read_csv("data/tweets_pred.csv")
 tweets = tweets.drop(columns=['Unnamed: 0', 'Unnamed: 0.1'])
-tweets.timestamp = pd.to_datetime(tweets.timestamp)
 
 # %%
+
+def round_time(column, freq = 'D'):
+    time_rounded = []
+    for time in column.to_numpy():
+        time = pd.Timestamp(time).round(freq=freq)
+        time_rounded.append(time)
+    return pd.DataFrame(time_rounded)
 
 def hype_scores(tweets_group, weights=(1,1,1)):
     """
@@ -31,22 +37,24 @@ def hype_scores(tweets_group, weights=(1,1,1)):
 
     return scores[0], scores[1]
 
-def get_hype(df, weights=(1,1,1), delta_t=1):
+def get_hype(df, grouping, weights=(1,1,1), delta_t=1):
 
     time_delta = pd.Timedelta(minutes=delta_t)
     hype = {}
     i = 0
 
-    for key in df.keyword.unique():
-        if key not in ["corona","COVID"]:
-            tweets_at_key = tweets[tweets.keyword == key].copy()
-            while tweets_at_key.shape[0] != 0:
-                time_start = tweets_at_key.timestamp.min()
-                tw = tweets_at_key[tweets_at_key.timestamp <= time_start + time_delta]
-                pos_hype, neg_hype = hype_scores(tw, weights)
-                tweets_at_key.drop(tw.index,inplace=True)
-                hype[i] = [key,str(time_start + time_delta/2),pos_hype,neg_hype]
-                i += 1
+    for group in grouping:
+        keys = grouping[group]
+        tweets_group = pd.DataFrame()
+        for key in keys:
+            tweets_group = pd.concat([tweets_group,tweets[tweets.keyword == key].copy()])
+        while tweets_group.shape[0] != 0:
+            time_start = tweets_group.timestamp.min()
+            tw = tweets_group[tweets_group.timestamp <= time_start + time_delta]
+            pos_hype, neg_hype = hype_scores(tw, weights)
+            tweets_group.drop(tw.index,inplace=True)
+            hype[i] = [group,str(time_start + time_delta/2),pos_hype,neg_hype]
+            i += 1
     
     return pd.DataFrame.from_dict(hype,orient='index',columns=["keyword","timestamp","pos_hype","neg_hype"])
 
@@ -70,10 +78,11 @@ def get_hype_corona(df, weights=(1,1,1), delta_t=1):
 
 # %%
 
-hype_companies = get_hype(tweets)
-hype_corona = get_hype_corona(tweets)
+tweets.timestamp = round_time(tweets.timestamp)
 
-df_to_csv = pd.concat([hype_companies, hype_corona])
+grouping = {'tesla':['$TSLA','tesla'],'corona':["corona","COVID"],'zoom':['$ZM']}
 
-df_to_csv.to_csv("data/tweets_hype.csv",header=True,index=False)
+hype = get_hype(tweets, grouping)
+
+hype.to_csv("data/tweets_hype.csv",header=True,index=False)
 
