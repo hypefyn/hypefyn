@@ -35,9 +35,9 @@ with open(".models/NB_trained.pickle","wb") as file:
 print("Model exported")
 
 # %%
-tweets_clean = pd.read_csv("data/tweets_clean_joint.json")
+tweets_clean = pd.read_json("data/tweets_clean_joint.json",orient='index')
 
-tweets_text = tweets_clean.text.to_list()
+tweets_text = tweets_clean.tokens.to_list()
 tweets_pred = pipeline.predict(tweets_text)
 tweets = pd.read_csv("data\all_tweets.csv")
 tweets_sent = ["Pos" if sent==4 else "Neg" for sent in tweets_pred]
