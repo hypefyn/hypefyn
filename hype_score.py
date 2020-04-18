@@ -68,5 +68,10 @@ grouping = {'tesla':['$TSLA','tesla'],'corona':["corona","COVID"],'zoom':['$ZM']
 
 hype = get_hype(tweets, grouping)
 
-hype.to_csv("data/tweets_hype.csv",header=True,index=False)
+hype_out = pd.DataFrame(hype.timestamp.unique(),columns=['datetime'])
 
+for key in grouping:
+    x = (hype[hype.keyword==key].pos_hype - hype[hype.keyword==key].neg_hype).to_numpy()
+    hype_out[key+"_hype"] = [np.log2(v) if v > 0 else -np.log2(-v) for v in x] 
+
+hype_out.to_csv("data/tweets_hype.csv",header=True,index=False)
