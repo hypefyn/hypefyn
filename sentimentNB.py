@@ -1,11 +1,11 @@
 # %%
-import json, pickle
+import pickle
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.feature_extraction.text import HashingVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer#, HashingVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.metrics import average_precision_score, confusion_matrix, classification_report
+# from sklearn.metrics import average_precision_score, confusion_matrix, classification_report
 
 
 # %%
@@ -15,7 +15,7 @@ print("Data Loaded")
 
 #%%
 
-train_text, test_text, train_label, test_label = train_test_split(data.tokens,data.label,test_size=0.2,random_state=100)
+# train_text, test_text, train_label, test_label = train_test_split(data.tokens,data.label,test_size=0.2,random_state=100)
 
 # %%
 pipeline = Pipeline([
@@ -34,14 +34,14 @@ with open(".models/NB_trained.pickle","wb") as file:
     pickle.dump(pipeline,file)
 print("Model exported")
 
-# %%
-tweets_clean = pd.read_json("data/tweets_clean_joint.json",orient='index')
+# %% Prediction
+# tweets_clean = pd.read_json("data/tweets_clean_joint.json",orient='index')
 
-tweets_text = tweets_clean.tokens.to_list()
-tweets_pred = pipeline.predict(tweets_text)
-tweets = pd.read_csv("data/all_tweets.csv")
-tweets_sent = ["Pos" if sent==4 else "Neg" for sent in tweets_pred]
-tweets_out = pd.concat([tweets, pd.DataFrame(tweets_sent,columns=["Prediction"])],axis=1)
-tweets_out.to_csv("data/tweets_pred.csv")
-print("Predictions generated")
+# tweets_text = tweets_clean.tokens.to_list()
+# tweets_pred = pipeline.predict(tweets_text)
+# tweets = pd.read_csv("data/all_tweets.csv")
+# tweets_sent = ["Pos" if sent==4 else "Neg" for sent in tweets_pred]
+# tweets_out = pd.concat([tweets, pd.DataFrame(tweets_sent,columns=["prediction"])],axis=1)
+# tweets_out.to_csv("data/tweets_pred.csv")
+# print("Predictions generated")
 
