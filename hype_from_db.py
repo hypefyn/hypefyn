@@ -1,5 +1,5 @@
 # Run the following in terminal 
-# cloud_sql_proxy.exe -instances=strategic-goods-273618:us-east1:hypefyn=tcp:3306
+# (cd C:\Users\PietroDomi\OneDrive - Georgia Institute of Technology\Data and Visual Analytics\Project && cloud_sql_proxy.exe -instances=strategic-goods-273618:us-east1:hypefyn=tcp:3306)
 
 import pymysql, argparse
 import pandas as pd
@@ -106,7 +106,9 @@ def main():
     connection = pymysql.connect(host='127.0.0.1',
                                 user=args.user,
                                 password=args.psw,
-                                db='Hypefyn')
+                                db='Hypefyn',
+                                charset='utf8mb4', 
+                                use_unicode=True)
     print("Connected to Google Database")
 
     companies = {
@@ -119,7 +121,6 @@ def main():
         'pfizer': ['pfizer','pfe'],
         'tesla': ['tesla','tsla'],
         'tripadvisor': ['tripadvisor','trip'],
-        'uber': ['uber','uberticker'],
         'zoom': ['zoom','zm']
     }
 
