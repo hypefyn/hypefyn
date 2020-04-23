@@ -1,25 +1,14 @@
-import os
-import sys
-import codecs
-import csv
+import argparse
 import pymysql
 import GetOldTweets3 as got
 
-user = 'pietro'
-psw = 'test123'
+parser = argparse.ArgumentParser()
+parser.add_argument('--user', type=str)
+parser.add_argument('--psw', type=str)
+args = parser.parse_args()
 
-# remaining: data march 22nd to march 31st
-# amazon $amzn corona covid delta $dal google $goog 
-# netflix $nflx novartis $nvs pfizer $pfe tesla $tsla tripadvisor $trip uber $uber zoom $zm
-# to distinguish between uber and $uber I did q="uber -$uber -filter:retweets"
-
-# would you please do the inserts for 
-# 1. setQuerySearch delta insert into delta for 2020-03-22, 2020-03-23, ..., 2020-03-31 and 
-# 2. setQuerySearch zoom insert into zoom for 2020-03-22, 2020-03-23, ..., 2020-03-31 and if you can 
-# 3. setQuerySearch corona insert into corona for 2020-03-22, 2020-03-23, ..., 2020-03-31
-
-# corona all
-# delta only 31
+if args.user == None or args.psw == None:
+    raise Exception("Cloud user and password missing")
 
 for key in ["tripadvisor","pfizer"]:
     day = "2020-03-22"
@@ -37,7 +26,7 @@ for key in ["tripadvisor","pfizer"]:
         tweets = got.manager.TweetManager.getTweets(tweetCriteria)
 
         connection = pymysql.connect(
-            host="34.74.21.31", user=user, password=psw, db="Hypefyn", charset='utf8mb4', use_unicode=True)
+            host="34.74.21.31", user=args.user, password=args.psw, db="Hypefyn", charset='utf8mb4', use_unicode=True)
         mycursor = connection.cursor()
 
         sql = "INSERT INTO " + key + " (ind, tweet, retweets, favorites, created) VALUES (%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE ind=%s;"
