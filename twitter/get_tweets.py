@@ -1,8 +1,4 @@
-import os
-import sys
 import tweepy as tw
-import codecs
-import csv
 import pymysql
 
 consumer_key = ''
@@ -17,12 +13,9 @@ auth = tw.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_secret)
 api = tw.API(auth, wait_on_rate_limit=True)
 
-# query is NOT case-sensitive
 tweets = tw.Cursor(api.search, tweet_mode="extended", q="$trip -filter:retweets",
-                   lang="en", since="2020-04-19", until="2020-04-20").items(1000) # start again from 14th 
+                   lang="en", since="2020-04-19", until="2020-04-20").items(1000) 
 
-# to distinguish between uber and $uber I did q="uber -$pfe -filter:retweets"
-# amazon corona/covid delta google netflix novartis pfizer tesla tripadvisor uber zoom 
 
 connection = pymysql.connect(
     host="34.74.21.31", user=user, password=psw, db="Hypefyn", charset='utf8mb4', use_unicode=True)

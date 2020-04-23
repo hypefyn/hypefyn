@@ -1,12 +1,29 @@
-# Run the following in terminal 
-# (cd C:\Users\PietroDomi\OneDrive - Georgia Institute of Technology\Data and Visual Analytics\Project && cloud_sql_proxy.exe -instances=strategic-goods-273618:us-east1:hypefyn=tcp:3306)
-
-import pymysql, argparse
+import pymysql
 import pandas as pd
 import numpy as np
 import tokenizer
-from hype_score import hype_scores
 import pickle
+
+def hype_scores(tweets_group, weights=(1,1,1)):
+    """
+    weights = (fav,ret,vol)
+    
+    returns pos_hype, neg_hype
+    """
+
+    pos = tweets_group[tweets_group.prediction == "Pos"].copy()
+    neg = tweets_group[tweets_group.prediction == "Neg"].copy()
+
+    scores = []
+
+    for sent in (pos, neg):
+        fav = sent.favourites.sum()
+        ret = sent.retweets.sum()
+        vol = sent.shape[0]
+        hype = weights[0]*fav + weights[1]*ret + weights[2]*vol
+        scores.append(hype)
+
+    return scores[0], scores[1]
 
 
 def get_sentiment(model, text):
@@ -94,16 +111,9 @@ def combine_hype(hypes,companies):
 
     return combined
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--user', type=str)
-    parser.add_argument('--psw', type=str)
-    args = parser.parse_args()
+def hype(args, sentiment_model):
 
-    if args.user == None or args.psw == None:
-        raise Exception("user and password missing")
-
-    connection = pymysql.connect(host='127.0.0.1',
+    connection = pymysql.connect(host='34.74.21.31',
                                 user=args.user,
                                 password=args.psw,
                                 db='Hypefyn',
@@ -125,10 +135,6 @@ def main():
     }
 
     cursor = connection.cursor()
-
-    with open(".models/NB_trained.pickle","rb") as file:
-        sentiment_model = pickle.load(file)
-        print("Pretrained model loaded")
     
     hypes = []
 
@@ -139,12 +145,5 @@ def main():
         print(f"Hype score computed for {company}")
 
     final_hype = combine_hype(hypes,companies)
-    print("Final hype merged")
-
-    final_hype.to_csv("data/tweets_hype_all.csv",header=True,index=True)
 
     return final_hype
-
-
-if __name__ == "__main__":
-    main()
