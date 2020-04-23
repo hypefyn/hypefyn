@@ -53,7 +53,7 @@ def get_tweet_from_sql(cursor, model, grouping, company):
     for key in keywords:
         cursor.execute("select count(*) from " + key + ";")
         length = cursor.fetchone()[0]
-        query = "select * from " + key + ";"
+        query = "select * from " + key + " where created >= \"2020-03-25\";"
         cursor.execute(query)
         tweets = {}
         for i in range(length):
@@ -87,7 +87,7 @@ def get_hype_score(tweets_sent_comp, weights=(1,1,1)):
 
     while tweets_group.shape[0] != 0:
         time_start = tweets_group.timestamp.min()
-        tw = tweets_group[tweets_group.timestamp <= time_start]# + time_delta]
+        tw = tweets_group[tweets_group.timestamp <= time_start]
         pos_hype, neg_hype = hype_scores(tw, weights)
         tweets_group.drop(tw.index,inplace=True)
         v = pos_hype - neg_hype
@@ -145,5 +145,6 @@ def hype(args, sentiment_model):
         print(f"Hype score computed for {company}")
 
     final_hype = combine_hype(hypes,companies)
+    final_hype.drop(index=["2020-03-22","2020-03-23","2020-03-24"],inplace=True)
 
     return final_hype
