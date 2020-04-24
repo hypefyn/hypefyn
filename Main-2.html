@@ -74,6 +74,7 @@
                         tripadvisor_hype: parseFloat(d.tripadvisor_hype)
                     }
                 }).then(function (data2) {
+                    console.log(data);
                     var minDate = d3.min(data, function(d) { return d.datetime});
                     var maxDate = d3.max(data, function(d) { return d.datetime});
                     var min2 = d3.min(data2, function(d) {return d.tesla_hype})
@@ -152,7 +153,7 @@
 
                     info.append("text")
                         .attr("y", 36)
-                        .text("Hover over the circles to view stock data at that point, and hover over the rectangles to view the hype data for that day.")
+                        .text("Hover over the circles to view stock percentage change for that day, and hover over the rectangles to view the hype data for that day.")
 
                     info.append("text")
                         .attr("y", 54)
