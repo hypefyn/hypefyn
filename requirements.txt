@@ -1,0 +1,6 @@
+sklearn
+nltk
+pymysql
+yfinance
+GetOldTweets3
+tweepy
