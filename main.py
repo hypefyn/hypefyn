@@ -22,6 +22,9 @@ if __name__ == "__main__":
 
     else:
         train_cols = ["polarity","id","date","query","user","text"]
+
+        # if the data is not in the folder download it from http://cs.stanford.edu/people/alecmgo/trainingandtestdata.zip 
+        # and unzip it under data/sentiment140/ . Rename the files train.csv and test.csv
         train_data = pd.read_csv(sentiment_path+"train.csv", encoding='latin',header=None,names=train_cols)
         val_data = pd.read_csv(sentiment_path+"test.csv", encoding='latin',header=None,names=train_cols)
 
