@@ -1,51 +1,42 @@
 # %%
-import pickle
-import pandas as pd
-from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.feature_extraction.text import TfidfVectorizer#, HashingVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.preprocessing import MaxAbsScaler
-from sklearn.svm import SVC
-from sklearn.metrics import average_precision_score, confusion_matrix, classification_report
-from sklearn.model_selection import GridSearchCV
-from sklearn.multiclass import OneVsRestClassifier
-from sklearn.linear_model import LogisticRegression
 
 # %%
 
-data = pd.read_json("data/sentiment140/sentiment140_clean_joint.json", orient='index')
-data.drop(data[data.label == 2].index,axis=0,inplace=True)
-print("Data Loaded")
+# data = pd.read_json("data/sentiment140/sentiment140_clean_joint.json", orient='index')
+# data.drop(data[data.label == 2].index,axis=0,inplace=True)
+# print("Data Loaded")
 
-#%%
+# #%%
 
-train_text, test_text, train_label, test_label = train_test_split(data.tokens,data.label,test_size=0.2,random_state=100)
-print("Splits created")
+# train_text, test_text, train_label, test_label = train_test_split(data.tokens,data.label,test_size=0.2,random_state=100)
+# print("Splits created")
 
-# %%
-pipeline = Pipeline([
-    ('tfidf', TfidfVectorizer()),  # integer counts to weighted TF-IDF scores
-    ('classifier', LogisticRegression(penalty='elasticnet',solver='saga',max_iter=500,n_jobs=-1)),  # train on TF-IDF vectors w/ Naive Bayes classifier
-])
+# # %%
+# pipeline = Pipeline([
+#     ('tfidf', TfidfVectorizer()),  # integer counts to weighted TF-IDF scores
+#     ('classifier', MultinomialNB()),  # train on TF-IDF vectors w/ Naive Bayes classifier
+# ])
 
-#%%
-model_cv = GridSearchCV(pipeline,
-                        param_grid={'classifier__l1_ratio':[0,0.5,1],
-                                    'classifier__C':[1,10,100]},
-                        n_jobs=-1)
-print("Training")
-model_cv.fit(train_text, train_label)
-print("Testing")
-best_pred = model_cv.best_estimator_.predict(test_text)
-print(model_cv.best_params_,"\n", classification_report(test_label, best_pred), confusion_matrix(test_label, best_pred))
+# #%%
+# model_cv = GridSearchCV(pipeline,
+#                         param_grid={'classifier__l1_ratio':[0,0.5,1],
+#                                     'classifier__C':[1,10]},
+#                         n_jobs=-1)
+# print("Training")
+# model_cv.fit(train_text, train_label)
+# print("Testing")
+# best_pred = model_cv.best_estimator_.predict(test_text)
+# print(model_cv.best_params_,"\n", classification_report(test_label, best_pred), confusion_matrix(test_label, best_pred))
 
 
 def train(data):
     
     pipeline = Pipeline([
         ('tfidf', TfidfVectorizer()),
-        ('classifier', LogisticRegression(penalty='elasticnet',solver='saga',max_iter=500,n_jobs=-1)),
+        ('classifier', MultinomialNB(alpha=10)),
     ])
 
     pipeline.fit(data.tokens, data.label)

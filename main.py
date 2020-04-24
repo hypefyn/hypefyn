@@ -2,7 +2,7 @@ import pandas as pd
 import os, argparse, pickle, json
 from nlp.tokenizer import *
 from nlp.hype import hype
-import nlp.sentiment
+import nlp.sentiment as sentiment
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

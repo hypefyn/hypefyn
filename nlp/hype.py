@@ -1,7 +1,7 @@
 import pymysql
 import pandas as pd
 import numpy as np
-import tokenizer
+import nlp.tokenizer as tokenizer
 import pickle
 
 def hype_scores(tweets_group, weights=(1,1,1)):
@@ -53,7 +53,7 @@ def get_tweet_from_sql(cursor, model, grouping, company):
     for key in keywords:
         cursor.execute("select count(*) from " + key + ";")
         length = cursor.fetchone()[0]
-        query = "select * from " + key + " where created >= \"2020-03-25\";"
+        query = "select * from " + key + ";"
         cursor.execute(query)
         tweets = {}
         for i in range(length):
